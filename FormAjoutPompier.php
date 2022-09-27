@@ -35,20 +35,22 @@
 
     <form method="post" action="ajoutPompier.php" id="form"  novalidate>
       <div class="form-row">
-        <div class="form-control-group col-md-6">
+        <div class="form-control-group col-md-3">
           <label for="matricule">Matricule</label>
           <input pattern="[0-9]{6}" class="form-control" name="matricule" id="matricule" placeholder="Ex : 876524" required>
           <div class="invalid-feedback">
             Le matricule est obligatoire ( Il est constitué de 6 chiffres )
           </div>
         </div>
-        <div class="form-group col-md-6">
+        <div class="form-group col-md-3">
           <label for="dateNaissance">Date de Naissance</label>
           <input type="date" class="form-control" name="dateNaissance" id="dateNaissance" required>
           <div class="invalid-feedback">
             La date de naissance est obligatoire
           </div>
         </div>
+      </div>
+      <div class="form-row">
         <div class="form-control-group col-md-6">
           <label for="nom">Nom</label>
           <input pattern="[A-Za-zéèà-]{3,45}" class="form-control" name="nom" id="Nom" required>
@@ -56,6 +58,8 @@
             Le nom du pompier est obligatoire (minimum 3 caractères maximum 45)
           </div>
         </div>
+      </div>
+      <div class="form-row">
         <div class="form-group col-md-6">
           <label for="prenom">Prénom</label>
           <input pattern="[A-Za-zéèà-]{3,45}" class="form-control" name="prenom" id="prenom" required>
@@ -63,7 +67,8 @@
             Le prénom du pompier est obligatoire (minimum 3 caractères maximum 45)
           </div>
         </div>
-
+      </div>
+      <div class="form-row">
         <!-- Boutons radio -->
         <div class="form-control-group col-md-6">
           <label class="md-3" for="sexe">Sexe  :</label>
@@ -79,9 +84,11 @@
             Le sexe est obligatoire
           </div>
         </div>
+      </div>
+      <div class="form-row">
 
         <!-- Liste déroulante -->
-        <div class="form-group col-md-6">
+        <div class="form-group col-md-3">
           <label for="grade">Grade</label>
           <div class="form-group">
             <select class="form-control" id="grade" name="grade">
@@ -98,15 +105,7 @@
           </div>
         </div>
 
-        <div class="form-control-group col-md-6">
-          <label for="tel">Téléphone</label>
-          <input type="tel" pattern="^[0-9]{10}$" class="form-control" name="tel" id="tel" required>
-          <div class="invalid-feedback">
-            Le numéro de téléphone est obligatoire
-          </div>
-        </div>
-
-        <div class="form-group col-md-6">
+        <div class="form-group col-md-3">
           <label for="caserne">Caserne</label>
           <div class="form-group">
             <select class="form-control" id="caserne">
@@ -122,7 +121,17 @@
             La caserne est obligatoire
           </div>
         </div>
-
+      </div>
+      <div class="form-row">
+        <div class="form-control-group col-md-6">
+          <label for="tel">Téléphone</label>
+          <input type="tel" pattern="^[0-9]{10}$" class="form-control" name="tel" id="tel" required>
+          <div class="invalid-feedback">
+            Le numéro de téléphone est obligatoire
+          </div>
+        </div>
+      </div>
+      <div class="form-row">  
 
         <div class="form-control-group col-md-12">
           <label class="md-3" for="type">Type pompier  :</label>
