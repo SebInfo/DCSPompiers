@@ -30,9 +30,7 @@
     require 'connection.php';
   ?>
   <div class="container">
-
     <h1>Ajout d'un Pompier</h1>
-
     <form method="post" action="ajoutPompier.php" id="form"  novalidate>
       <div class="form-row">
         <div class="form-control-group col-md-3">
@@ -93,9 +91,9 @@
           <div class="form-group">
             <select class="form-control" id="grade" name="grade">
               <?php
-                $listeGrade = "SELECT LblGrade, idGrade FROM DSC.Grade;";
+                $listeGrade = "SELECT idGrade, LblGrade FROM DSC.Grade;";
                 foreach  ($db->query($listeGrade) as $row) {
-                  echo '<option value="'.$row[idGrade].'">'.ucwords($row[LblGrade]).'</option>';
+                  echo '<option value="'.$row["idGrade"].'">'.ucwords($row["LblGrade"]).'</option>';
                 }
               ?>
             </select>
@@ -112,7 +110,7 @@
               <?php
                 $listeCaserne = "SELECT NomCaserne FROM DSC.Caserne;";
                 foreach  ($db->query($listeCaserne) as $row) {
-                  echo '<option value="'.$row[NomCaserne].'">'.ucwords($row[NomCaserne]).'</option>';
+                  echo '<option value="'.$row["NomCaserne"].'">'.ucwords($row["NomCaserne"]).'</option>';
                 }
               ?>
             </select>
@@ -179,7 +177,7 @@
           </div>
         </div> 
 
-          <!-- Partie pro -->
+        <!-- Partie pro -->
         <div id="blockPro">
           <div class="form">
               <label for="indice">Indice</label>
