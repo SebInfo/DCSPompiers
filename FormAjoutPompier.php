@@ -106,11 +106,11 @@
         <div class="form-group col-md-3">
           <label for="caserne">Caserne</label>
           <div class="form-group">
-            <select class="form-control" id="caserne">
+            <select class="form-control" name="caserne" id="caserne">
               <?php
-                $listeCaserne = "SELECT NomCaserne FROM DSC.Caserne;";
+                $listeCaserne = "SELECT idCaserne, NomCaserne FROM DSC.Caserne;";
                 foreach  ($db->query($listeCaserne) as $row) {
-                  echo '<option value="'.$row["NomCaserne"].'">'.ucwords($row["NomCaserne"]).'</option>';
+                  echo '<option value="'.$row["idCaserne"].'">'.ucwords($row["NomCaserne"]).'</option>';
                 }
               ?>
             </select>
@@ -138,7 +138,7 @@
             <label class="custom-control-label" for="pro">Professionnel</label>
           </div>
           <div class="custom-control custom-radio custom-control-inline">
-            <input type="radio" class="custom-control-input" id="volontaire" name="type" value="volontaire" onchange="aff_cach_input('volontaire')" checked>
+            <input type="radio" class="custom-control-input"  id="volontaire" name="type" value="volontaire" onchange="aff_cach_input('volontaire')" checked>
             <label class="custom-control-label" for="volontaire">Volontaire</label>
           </div>   
           <div class="invalid-feedback">
@@ -146,20 +146,18 @@
           </div>
           
         </div>
-
-
   
         <!-- Partie volontaire -->
         <!-- Liste déroulante -->
         <div id="blockVolontaire">
           <div class="form">
-            <label for="emloyeur" id="titreEmployeur">Employeur</label>
+            <label for="employeur" >Employeur</label>
             <div class="form-group">
-              <select class="form-control col-md-6" id="employeur">
+              <select class="form-control col-md-6" name="employeur" id="employeur">
                 <?php
-                  $listeGrade = "SELECT NomEmployeur FROM DSC.Employeur;";
+                  $listeGrade = "SELECT idEmployeur, NomEmployeur FROM DSC.Employeur;";
                   foreach  ($db->query($listeGrade) as $row) {
-                    echo '<option value="'.$row[idEmployer].'">'.ucwords($row[NomEmployeur]).'</option>';
+                    echo '<option value="'.$row["idEmployeur"].'">'.ucwords($row["NomEmployeur"]).'</option>';
                   }
                 ?>
               </select>
@@ -170,7 +168,7 @@
           </div>
           <div class="form">
               <label for="bip" id="titreBip">Bip</label>
-              <input type="number" class="form-control" name="bip" id="bip" placeholder="Ex : 123" required>
+              <input type="number" class="form-control" name="bip" id="bip" placeholder="Ex : 123" >
               <div class="invalid-feedback">
                 Le Bip obligatoire
               </div>
