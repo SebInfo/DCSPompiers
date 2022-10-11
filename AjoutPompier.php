@@ -1,6 +1,5 @@
 <?php
 require 'connection.php';
-$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 if ($_SERVER["REQUEST_METHOD"] == "POST")
 {
@@ -48,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST")
 		// Préparation de la requête principale
 		$req = $db->prepare('INSERT INTO DSC.Pompier (Matricule, NomPompier, PrenomPompier, DateNaissPompier, TelPompier, SexePompier, idGrade) VALUES (:mMatricule, :mNomPompier, :mPrenomPompier, :mDateNaissPompier, :mTelPompier, :mSexePompier, :midGrade )');
 
-		// On va utiliser bind pour lier les variables PHP au paramètre :m de prépare
+		// On va utiliser bindParam pour lier les variables PHP au paramètre :m de prépare
 		$req->bindParam(':mMatricule', $matricule);
 		$req->bindParam(':mNomPompier', $nom);
 		$req->bindParam(':mPrenomPompier', $prenom);
