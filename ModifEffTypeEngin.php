@@ -1,5 +1,4 @@
-<?php
-require 'connection.php';
+<?php 
 $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 $ancienNom = $_GET['nom'];
 
