@@ -6,7 +6,7 @@
       <?php 
         echo generationOptions('Ajouter une pompier','Ajouter un pompier','SDIS.jpeg','ajoutPompier.php');
         echo generationOptions('Gestion des affectations','Affectation aux casernes');
-        echo generationOptions('Gestion des habilitations','Gestions des habilitations',);
+        echo generationOptions('Gestion des habilitations','Gestions des habilitations');
       ?>
     </div>
   </div>

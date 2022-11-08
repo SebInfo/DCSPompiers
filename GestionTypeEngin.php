@@ -1,4 +1,11 @@
 <?php require('include/entete.inc.php');?>
+<?
+
+  if($_SESSION['login']!=true)
+  {
+    header("Location:connexion.php");
+  }
+?>
     <main role="main">
       <?php echo generationEntete("Les types engins","Voici la liste des types de véhicules que l'on peut trouver dans une caserne de pompiers."); ?>
       <div class="album py-5 bg-light">

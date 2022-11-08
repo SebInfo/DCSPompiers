@@ -1,4 +1,9 @@
 <?php
+  session_start();
+  if($_SESSION['login']!=true)
+  {
+    header("Location:connexion.php");
+  }
   if(isset($_GET['id']) && isset($_GET['image']))
   {
     require('include/connection.inc.php');

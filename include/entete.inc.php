@@ -1,10 +1,18 @@
-<?php
-    date_default_timezone_set('EUROPE/Paris');
-    setlocale(LC_TIME, 'fr', 'fr_FR', 'fr_FR.ISO8859-1');
-    setcookie("visite",strftime("Dernière connexion %A %d %B %Y heure %H h %M"),time()*60);
-    require_once ('connection.inc.php');
-    include ('mesFonctions.inc.php');
-    include("svg.inc.php");
+<?php 
+  if (!isset($_SESSION))
+  {
+    session_start();
+  }
+  if (!isset($_SESSION['login']))
+  {
+    $_SESSION['login'] = False;
+  }
+  date_default_timezone_set('EUROPE/Paris');
+  setlocale(LC_TIME, 'fr', 'fr_FR', 'fr_FR.ISO8859-1');
+  setcookie("visite",strftime("Dernière connexion %A %d %B %Y heure %H h %M"),time()*60);
+  require_once ('connection.inc.php');
+  include ('mesFonctions.inc.php');
+  include("svg.inc.php");
 ?>
 <!doctype html>
 <html lang="fr">

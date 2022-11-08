@@ -1,5 +1,9 @@
 <?php
   require('include/connection.inc.php');
+  if($_SESSION['login']!=true)
+  {
+    header("Location:connexion.php");
+  }
   if(isset($_POST['valider']))
   {
     // On récupère les valeurs qu'il y avait dans le formulaire

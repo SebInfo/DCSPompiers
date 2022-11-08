@@ -1,5 +1,12 @@
+
 <?php
   require('include/connection.inc.php');
+  session_start();
+  if($_SESSION['login']!=true)
+  {
+    header("Location:connexion.php");
+  }
+  require('include/entete.inc.php');
   if(isset($_POST['validerP']))
   {
     // On récupère les valeurs qu'il y avait dans le formulaire
@@ -140,7 +147,6 @@
     }
 }
 ?>
-<?php require('include/entete.inc.php');?>
 <main>
   <script>
     function aff_cach_input(action)
