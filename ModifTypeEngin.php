@@ -1,28 +1,11 @@
-<!doctype html>
-<html>
-  <head>
-    <title>Modification d'un type d'engin</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Liaison au fichier css de Bootstrap -->
-    <link href="Bootstrap/css/bootstrap.css" rel="stylesheet">
-
-  </head>
-
-  <body>
+<?php require('include/entete.inc.php');?>
+<main>
+  <?php echo generationEntete("Modification d'un type Engin","Modifier les champs qui vous semble utile !"); ?>
     <main role="main">
-      <section class="jumbotron text-center">
-        <div class="container">
-          <h1 class="jumbotron-heading">Modification d'un type Engin</h1>
-          <p class="lead text-muted">Modifier les champs qui vous semble utile !</p>
-        </div>
-      </section>
-
       <div class="album py-5 bg-light">
         <div class="container">
           <div class="row justify-content-center">
           <?php
-                require 'connection.php';
                 $id=$_GET["id"];
                 $leTypeEngin = "SELECT idTypeEngin, LblEngin, image FROM DSC.TypeEngin WHERE idTypeEngin='$id';";
                 foreach ($db->query($leTypeEngin) as $row) 
@@ -105,13 +88,4 @@
       }
     </script>
 
-
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="../../assets/js/vendor/popper.min.js"></script>
-    <script src="../../dist/js/bootstrap.min.js"></script>
-    <script src="../../assets/js/vendor/holder.min.js"></script>
-  </body>
-</html>
+<?php require('include/pied.inc.php');?>
