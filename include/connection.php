@@ -1,4 +1,5 @@
 <?php
+
 $dotenv = parse_ini_file(__DIR__ . '/.env');
 
 $hote       = $dotenv['DB_HOST'];

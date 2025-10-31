@@ -1,4 +1,4 @@
-<?php require('include/entete.inc.php');?>
+<?php require('include/entete.php');?>
 <main>
 <div class="container w-50 h-50 mt-4">
 <div id="carouselExampleSlidesOnly" class="carousel slide" data-bs-ride="carousel">
@@ -12,4 +12,4 @@
   </div>
 </div>
 </main>
-<?php require('include/pied.inc.php');?>
+<?php require('include/pied.php');?>
