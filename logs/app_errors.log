@@ -1,0 +1,9 @@
+[2025-10-31 11:03:04] Erreur PDO : SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '871892' for key 'PRIMARY' dans /Applications/MAMP/htdocs/DSCPompier2025/ajoutPompier.php ligne 48
+[2025-10-31 11:12:53] Erreur PDO : SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '121334' for key 'PRIMARY' dans /Applications/MAMP/htdocs/DSCPompier2025/ajoutPompier.php ligne 48
+[2025-10-31 11:15:16] Erreur PDO : SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '121334' for key 'PRIMARY' dans /Applications/MAMP/htdocs/DSCPompier2025/ajoutPompier.php ligne 48
+[2025-10-31 11:15:20] Erreur PDO : SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '121334' for key 'PRIMARY' dans /Applications/MAMP/htdocs/DSCPompier2025/ajoutPompier.php ligne 48
+[2025-10-31 11:16:44] Erreur PDO : SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '788099' for key 'PRIMARY' dans /Applications/MAMP/htdocs/DSCPompier2025/ajoutPompier.php ligne 48
+[2025-10-31 12:13:54] Erreur PDO : SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '555514' for key 'PRIMARY' dans /Applications/MAMP/htdocs/DSCPompier2025/ajoutPompier.php ligne 48
+[2025-10-31 12:14:57] Erreur PDO : SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '555514' for key 'PRIMARY' dans /Applications/MAMP/htdocs/DSCPompier2025/ajoutPompier.php ligne 48
+[2025-10-31 12:34:38] Erreur PDO : SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '112255' for key 'PRIMARY' dans /Applications/MAMP/htdocs/DSCPompier2025/ajoutPompier.php ligne 49
+[2025-10-31 14:54:56] Erreur PDO : SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '222222' for key 'PRIMARY' dans /Applications/MAMP/htdocs/DSCPompier2025/ajoutPompier.php ligne 71

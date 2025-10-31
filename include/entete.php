@@ -31,10 +31,9 @@ setcookie('visite', $formatter->format(time()), [
 ]);
 
 // --- Inclusion des fichiers nécessaires ---
-require_once __DIR__ . '/connection.php';
+require_once __DIR__ . '/baseDonnees.php';
 require_once __DIR__ . '/mesFonctions.php';
-require_once __DIR__ . '/svg.php';
-
+require_once __DIR__ . '/svg.html';
 ?>
 <!doctype html>
 <html lang="fr">

@@ -1,152 +1,127 @@
-
 <?php
-  require('include/connection.inc.php');
-  session_start();
-  if($_SESSION['login']!=true)
-  {
-    header("Location:connexion.php");
-  }
-  require('include/entete.inc.php');
-  if(isset($_POST['validerP']))
-  {
-    // On récupère les valeurs qu'il y avait dans le formulaire
-    $matricule =  $_POST['matricule'];
-    $nom = $_POST['nom'];
-    $prenom = $_POST['prenom'];
-    $dateNaissance = $_POST['dateNaissance'];
-    $tel = $_POST['tel'];
-    $sexe = $_POST['sexe'];
-    $grade = $_POST['grade'];
-    $type = $_POST['type'];
-    $bip = substr($_POST['bip'], 0, 3); 
-    $idEmployeur = $_POST['employeur'];
-    $dateEmbauche = $_POST['dateEmbauche'];
-    $indice = $_POST['indice'];
-    $idCaserne = $_POST['caserne'];
+// ==========================
+// 1. Contrôle d’accès
+// ==========================
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+if (empty($_SESSION['login']) || $_SESSION['login'] !== true) {
+    header('Location: connexion.php');
+    exit;
+}
 
-    // On va maintenant effectuer les tests
-    $erreur = False; // on est optimiste
-
-    // tests sur le matricule
-    if (!isset($matricule) || strlen($matricule)!=6) 
-    {
-      $erreur = True;
+// ==========================
+// 2. Traitement du formulaire
+// ==========================
+$insertionOK = false;
+$erreur = false;
+require_once __DIR__ . '/include/baseDonnees.php';
+if (isset($_POST['validerP'])) 
+{
+    $matricule = filter_input(INPUT_POST, 'matricule', FILTER_UNSAFE_RAW);
+    if (!preg_match('/^\d{6}$/', $matricule)) {
+      $erreur = true;
     }
-    // tests sur le nom
-    if (!isset($nom) || strlen($nom)<3 || strlen($nom)>45 || !is_string($nom))
-    {
-      $erreur = True;
-    }
-    // tests sur le prénom
-    if (!isset($prenom) || strlen($prenom)<3 || strlen($prenom)>45 || !is_string($prenom))
-    {
-      $erreur = True;
-    }
+    $erreur = false;
 
-    // Ajout si pas d'erreur
-    if( ! $erreur )
+    $nom = filter_input(INPUT_POST, 'nom', FILTER_SANITIZE_SPECIAL_CHARS);
+    $prenom = filter_input(INPUT_POST, 'prenom', FILTER_SANITIZE_SPECIAL_CHARS);
+    $dateNaissance = $_POST['dateNaissance'] ?? null;
+    $tel = $_POST['tel'] ?? '';
+    $sexe = $_POST['sexe'] ?? '';
+    $grade = $_POST['grade'] ?? '';
+    $type = $_POST['type'] ?? '';
+    $bip = substr($_POST['bip'] ?? '', 0, 3);
+    $idEmployeur = $_POST['employeur'] ?? null;
+    $dateEmbauche = $_POST['dateEmbauche'] ?? null;
+    $indice = $_POST['indice'] ?? null;
+    $idCaserne = $_POST['caserne'] ?? null;
+
+    if (strlen($matricule) !== 6 || !ctype_digit($matricule)) $erreur = true;
+    if (strlen($nom) < 3 || strlen($nom) > 45) $erreur = true;
+    if (strlen($prenom) < 3 || strlen($prenom) > 45) $erreur = true;
+
+    if (!$erreur) 
     {
-      // Il manque l'ajout d'une occurence dans la table affectation
-      // Afin de mémoriser l'affectation du pompier à sa caserne
-      
-      // Préparation de la requête principale
-      $req = $db->prepare('INSERT INTO DSC.Pompier (Matricule, NomPompier, PrenomPompier, DateNaissPompier, TelPompier, SexePompier, idGrade) VALUES (:mMatricule, :mNomPompier, :mPrenomPompier, :mDateNaissPompier, :mTelPompier, :mSexePompier, :midGrade )');
+        try {
+            $db->beginTransaction();
 
-      // On va utiliser bindParam pour lier les variables PHP au paramètre :m de prépare
-      $req->bindParam(':mMatricule', $matricule);
-      $req->bindParam(':mNomPompier', $nom);
-      $req->bindParam(':mPrenomPompier', $prenom);
-      $req->bindParam(':mDateNaissPompier', $dateNaissance);
-      $req->bindParam(':mTelPompier', $tel);
-      $req->bindParam(':mSexePompier', $sexe);
-      $req->bindParam(':midGrade', $grade);
+            // Insertion du pompier
+            $req = $db->prepare('
+                INSERT INTO DSC.Pompier 
+                (Matricule, NomPompier, PrenomPompier, DateNaissPompier, TelPompier, SexePompier, idGrade)
+                VALUES (:mat, :nom, :prenom, :naiss, :tel, :sexe, :grade)
+            ');
+            $req->execute([
+                ':mat' => $matricule,
+                ':nom' => $nom,
+                ':prenom' => $prenom,
+                ':naiss' => $dateNaissance,
+                ':tel' => $tel,
+                ':sexe' => $sexe,
+                ':grade' => $grade
+            ]);
 
-      // On tente avec un try d'executer la requête
-      try
-      {
-        $req->execute();
-      }
-      catch(PDOException $e)
-      {
-        if ($e->getCode()==23000)
+            if ($type === 'volontaire') {
+                $req = $db->prepare('
+                    INSERT INTO DSC.Volontaire (MatVolontaire, Bip, IdEmployeur)
+                    VALUES (:mat, :bip, :emp)
+                ');
+                $req->execute([':mat' => $matricule, ':bip' => $bip, ':emp' => $idEmployeur]);
+            } elseif ($type === 'professionnel') {
+                $req = $db->prepare('
+                    INSERT INTO DSC.Professionnel (MatPro, DateEmbauche, Indice)
+                    VALUES (:mat, :emb, :ind)
+                ');
+                $req->execute([':mat' => $matricule, ':emb' => $dateEmbauche, ':ind' => $indice]);
+            }
+
+            // Affectation
+            $req = $db->prepare('
+                INSERT INTO DSC.Affectation (Matricule, DateAff, IdCaserne)
+                VALUES (:mat, :date, :cas)
+            ');
+            $req->execute([
+                ':mat' => $matricule,
+                ':date' => date('Y-m-d'),
+                ':cas' => $idCaserne
+            ]);
+
+            $db->commit();
+            header('Location: lesPompiers.php');
+            exit;
+        } 
+        catch (PDOException $e) 
         {
-          echo "Ce matricule existe déjà";
-        }
-        else
-        {
-          echo $e->getMessage();
-        }
-      }
+            // Création du chemin du fichier log
+            $logFile = __DIR__ . '/logs/app_errors.log';
 
-      // Requête pour insérer dans la table Professionel ou Volontaire
-      // Préparation de la requête pour le Professionel
-      $pro = $db->prepare('INSERT INTO DSC.Professionnel (MatPro, DateEmbauche, Indice) VALUES (:mMatricule, :mDateEmbauche, :mIndice)');
+            // Formatage du message
+            $message = sprintf(
+              "[%s] Erreur PDO : %s dans %s ligne %d%s",
+              date('Y-m-d H:i:s'),
+              $e->getMessage(),
+              $e->getFile(),
+              $e->getLine(),
+              PHP_EOL
+            );
+            // Écriture dans le fichier
+            error_log($message, 3, $logFile);
 
-      // Préparation de la requête pour le pompier Volontaire
-      $vol = $db->prepare('INSERT INTO DSC.Volontaire (MatVolontaire, Bip, IdEmployeur) VALUES (:mMatricule, :mBip, :mIdEmployeur)');
-
-      if ($type == "volontaire") 
-      {
-        // Alors la requêtes qu'on va executer est $vol
-        $req = $vol;
-        // On va utiliser bind pour lier les variables PHP au paramètre :m de prépare
-        $req->bindParam(':mMatricule', $matricule);
-        $req->bindParam(':mBip', $bip);
-        $req->bindParam(':mIdEmployeur', $idEmployeur);
-
-      }
-      elseif ($type == "professionnel") {
-        // Alors la requêtes qu'on va executer est $pro
-        $req = $pro;
-        // On va utiliser bind pour lier les variables PHP au paramètre :m de prépare
-        $req->bindParam(':mMatricule', $matricule);
-        $req->bindParam(':mDateEmbauche', $dateEmbauche);
-        $req->bindParam(':mIndice', $indice);
-      }
-      else
-      {
-        # Ce cas ne doit pas arriver normalement car on a un bouton radio
-        echo "Houston on a un problème !";
-      }
-
-      // On tente avec un try d'executer la requête
-      try
-      {
-        $req->execute();
-      }
-      catch(PDOException $e)
-      {
-        echo "prb dans l'ajout des tables volontaire ou professionnel !";
-        echo $e->getMessage();
-      }
-
-      // Ajout dans affectation
-      $req = $db->prepare('INSERT INTO DSC.Affectation (Matricule, DateAff, IdCaserne) VALUES (:mMatricule, :mDateAffectation, :mIdCaserne)');
-      $req->bindParam(':mMatricule', $matricule);
-      $dateJour = date("Y-m-d");
-      $req->bindParam(':mDateAffectation', $dateJour );
-      $req->bindParam(':mIdCaserne', $idCaserne);
-
-      // On tente avec un try d'executer la requête
-      try
-      {
-        $req->execute();
-        header('Location: lesPompiers.php');
-      }
-      catch(PDOException $e)
-      {
-        echo "prb dans l'ajout d'une valeur dans la table Affectation !";
-        echo $e->getMessage();
-      }
-
+            echo "<div class='alert alert-danger'>Erreur lors de l’insertion (voir logs/app_errors.log)</div>";
+        } 
     }
-    else
+    else 
     {
-      echo "On a trouvé des erreurs dans le filtrage des informations";
+        echo "<div class='alert alert-warning'>Erreur dans le formulaire.</div>";
     }
 }
+
+require_once 'include/entete.php';
 ?>
+
+
 <main>
   <script>
     function aff_cach_input(action)
@@ -342,4 +317,4 @@
       </form>
   </div>
 </main>
-<?php require('include/pied.inc.php');?>
+<?php require('include/pied.php');?>

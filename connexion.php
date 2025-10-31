@@ -1,18 +1,19 @@
 <?php
-if (!isset($_SESSION))
-{
-    session_start(); 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
+
 if(isset($_POST['ValiderLogin']))
 {
     if ($_POST['login']==='Mylène' and $_POST['motDePasse']==='Micoton')
     {
         $_SESSION['login']=true;
         header("Location:index.php");
+        exit();
     }
 }
 ?>
-<?php require('include/entete.inc.php');?>
+<?php require('include/entete.php');?>
 <main>
     <?php echo generationEntete("Identification","Veuillez vous identifier."); ?>
     <form class="container col-6 col-md-4" method="post" action="connexion.php">
@@ -27,4 +28,4 @@ if(isset($_POST['ValiderLogin']))
     <button type="submit" class="btn btn-primary" name="ValiderLogin">Valider</button>
     </form>
 </main>
-<?php require('include/pied.inc.php');?>
+<?php require('include/pied.php');?>

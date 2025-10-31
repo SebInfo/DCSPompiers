@@ -1,3 +1,4 @@
+
 <?php
 /**
  * Application SDIS – Gestion opérationnelle des secours
@@ -18,10 +19,6 @@
  * @since 2025-10-31
  * 
  */
-
-declare(strict_types=1);
-
-<?php 
 require_once __DIR__ . '/include/entete.php';
 ?>
 <main>
