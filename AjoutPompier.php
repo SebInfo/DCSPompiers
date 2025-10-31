@@ -89,7 +89,32 @@ if (isset($_POST['validerP']))
             ]);
 
             $db->commit();
-            header('Location: lesPompiers.php');
+            // On inclut ton entête
+            require_once 'include/entete.php';
+            ?>
+
+            <main class="d-flex flex-column justify-content-center align-items-center" style="height: 70vh;">
+                <div class="alert alert-success text-center p-5 shadow-lg">
+                    <h2 class="mb-3">✅ Ajout du pompier effectué avec succès !</h2>
+                    <p>Vous allez être redirigé vers la liste des pompiers dans <strong>5 secondes</strong>...</p>
+                    <div class="spinner-border text-success mt-3" role="status">
+                        <span class="visually-hidden">Redirection...</span>
+                    </div>
+                    <p class="mt-4">
+                        <a href="lesPompiers.php" class="btn btn-primary">Redirection immédiate</a>
+                    </p>
+                </div>
+            </main>
+
+            <script>
+                // Redirection automatique après 5 secondes
+                setTimeout(() => {
+                    window.location.href = 'lesPompiers.php';
+                }, 5000);
+            </script>
+
+            <?php
+            require_once 'include/pied.php';
             exit;
         } 
         catch (PDOException $e) 
