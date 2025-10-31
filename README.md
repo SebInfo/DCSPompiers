@@ -70,8 +70,8 @@ Exemple :
 DB_HOST=127.0.0.1
 DB_PORT=8888
 DB_NAME=DSC
-DB_USER=root
-DB_PASS=root
+DB_USER=userDSC
+DB_PASS=IciVotreMotDePasse!
 ```
 
 ---
@@ -80,7 +80,7 @@ DB_PASS=root
 
 1. **Cloner le projet**
    ```bash
-   git clone https://github.com/<ton-utilisateur>/DSCPompier2025.git
+   git clone https://github.com/SebInfo/DSCPompier2025.git
    cd DSCPompier2025
    ```
 
@@ -134,8 +134,5 @@ Ce projet illustre :
 - Le respect des standards du code (PSR-12)
 - Les notions de sessions, cookies et formulaires sécurisés
 
----
-
-🧯 _« Sauver ou développer, il faut choisir… les pompiers font les deux. »_
 
 
