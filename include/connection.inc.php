@@ -1,17 +1,20 @@
 <?php
-$hote = "127.0.0.1:8888";
-$bd = "DSC";
-$login = "root";
-$motDePasse ="root";
-$erreur = null;
+$dotenv = parse_ini_file(__DIR__ . '/.env');
 
-try
-{
-    $db = new PDO("mysql:host = $hote;dbname=$bd;charset=utf8",$login,$motDePasse);
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-}
-catch (Exception $e)
-{
-     $error = "Erreur dans la connexion: ".$e->getMessage();
-     echo "<div class='alert alert-danger'>$error</div>";
+$hote       = $dotenv['DB_HOST'];
+$port       = $dotenv['DB_PORT'];
+$bd         = $dotenv['DB_NAME'];
+$login      = $dotenv['DB_USER'];
+$motDePasse = $dotenv['DB_PASS'];
+
+$dsn = "mysql:host=$hote;port=$port;dbname=$bd;charset=utf8";
+
+try {
+    $db = new PDO($dsn, $login, $motDePasse, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+    ]);
+} catch (PDOException $e) {
+    error_log($e->getMessage()); // consigne l’erreur dans les logs du serveur
+    echo "<div class='alert alert-danger'>Erreur de connexion à la base de données.</div>";
 }
