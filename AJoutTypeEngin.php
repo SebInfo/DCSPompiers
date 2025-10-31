@@ -1,6 +1,6 @@
 <?php
   session_start();
-  require('include/connection.inc.php');
+  require('include/baseDonnees.php');
   if($_SESSION['login']!=true)
   {
     header("Location:connexion.php");
@@ -79,7 +79,7 @@
     }
   }
 ?>
-<?php require('include/entete.inc.php');?>
+<?php require('include/entete.php');?>
 <main>
   <?php echo generationEntete("Ajout d'un type d'Engin","Gestion des type d'engin dans les casernes"); ?>
     <div class="container">
@@ -126,5 +126,5 @@
       </form>
     </div>
 </main>
-<?php require('include/pied.inc.php');?>
+<?php require('include/pied.php');?>
  
