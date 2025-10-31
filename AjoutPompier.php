@@ -87,12 +87,11 @@ if (isset($_POST['validerP']))
                 ':date' => date('Y-m-d'),
                 ':cas' => $idCaserne
             ]);
-
+            // On valide l'ajout
             $db->commit();
-            // On inclut ton entête
             require_once 'include/entete.php';
             ?>
-
+            <!-- Ecran pour indiquer que l'ajout c'est bien déroulé -->
             <main class="d-flex flex-column justify-content-center align-items-center" style="height: 70vh;">
                 <div class="alert alert-success text-center p-5 shadow-lg">
                     <h2 class="mb-3">✅ Ajout du pompier effectué avec succès !</h2>
@@ -107,7 +106,7 @@ if (isset($_POST['validerP']))
             </main>
 
             <script>
-                // Redirection automatique après 5 secondes
+                // Redirection automatique après 5 secondes vers la page gérant les pompiers
                 setTimeout(() => {
                     window.location.href = 'lesPompiers.php';
                 }, 5000);

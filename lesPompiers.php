@@ -5,6 +5,7 @@
     <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
       <?php 
         echo generationOptions('Ajouter un pompier','SDIS.jpeg','ajoutPompier.php');
+        echo generationOptions('Modification Pompier','affectation.jpg');
         echo generationOptions('Gestion des affectations','affectation.jpg');
         echo generationOptions('Gestion des habilitations');
       ?>

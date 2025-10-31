@@ -4,10 +4,9 @@ if($_SESSION['login']!=true)
 {
   header("Location:connexion.php");
 }
-require('include/entete.inc.php');
+require('include/baseDonnees.php');
 if(isset($_POST['valider']))
 {
-  require('include/connection.inc.php');
   $ancienNom = $_GET['nom'];
   // On récupère les valeurs qu'il y avait dans le formulaire
 	$LblEngin = $_POST['LblEngin'];
@@ -84,6 +83,7 @@ if(isset($_POST['valider']))
 }
 else
 {
+  require('include/entete.php');
     echo generationEntete("Modification d'un type Engin","Modifier les champs qui vous semble utile !"); 
 }
 ?>
@@ -173,4 +173,4 @@ else
         }
       }
     </script>
-<?php require('include/pied.inc.php');?>
+<?php require('include/pied.php');?>

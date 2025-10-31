@@ -1,4 +1,4 @@
-<?php require('include/entete.inc.php');?>
+<?php require('include/entete.php');?>
 <?
   if($_SESSION['login']!=true)
   {
@@ -38,4 +38,4 @@
           <a href="ajoutTypeEngin.php" role="button" class="btn btn-success btn-lg">Ajouter</a>
       </div> 
     </main>
-<?php require('include/pied.inc.php');?>
+<?php require('include/pied.php');?>
