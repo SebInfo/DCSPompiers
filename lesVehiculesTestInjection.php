@@ -1,17 +1,11 @@
 <?php require('include/entete.inc.php');?>
-<?
-  if($_SESSION['login']!=true)
-  {
-    header("Location:connexion.php");
-  }
-?>
-    <main role="main">
-      <?php echo generationEntete("Les types engins","Voici la liste des types de véhicules que l'on peut trouver dans une caserne de pompiers."); ?>
-      <div class="album py-5 bg-light">
-        <div class="container">
-          <div class="row">
-          <?php
-                $listeVeh = "SELECT idTypeEngin, LblEngin, image FROM TypeEngin;";
+<main>
+  <?php echo generationEntete("Test hacking","Injection Code SQL"); ?>
+  <div class="container py-3">
+    <div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+    <?php
+                $id = $_GET['id'];
+                $listeVeh = "SELECT * FROM TypeEngin WHERE idTypeEngin = $id;";
                 foreach ($db->query($listeVeh) as $row) 
                 {?>            
                   <div class="col-md-4">
@@ -30,12 +24,7 @@
                   </div>        
                 <?php }
           ?>
-          </div>
-        </div>
-      </div>
-      <div class="row"> 
-        <div class="col text-center"> 
-          <a href="ajoutTypeEngin.php" role="button" class="btn btn-success btn-lg">Ajouter</a>
-      </div> 
-    </main>
+    </div>
+  </div>
+</main>
 <?php require('include/pied.inc.php');?>

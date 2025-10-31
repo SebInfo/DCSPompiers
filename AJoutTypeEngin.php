@@ -1,4 +1,5 @@
 <?php
+  session_start();
   require('include/connection.inc.php');
   if($_SESSION['login']!=true)
   {
@@ -86,7 +87,7 @@
         <div class="row justify-content-center">
           <div class="col-md-4">
             <div class="card mb-4 box-shadow">
-              <img class="card-img-top" src="" id="photo"  width=20% class="img-responsive float-right" >
+              <img class="card-img-top" src="./images/logo.jpg" id="photo"  width=10% class="img-responsive float-right" >
             </div>
           </div>
         </div>

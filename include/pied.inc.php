@@ -6,7 +6,7 @@
               <a href="/" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
                 <svg class="bi" width="30" height="24"><use xlink:href="#bootstrap"/></svg>
               </a>
-                <p><small>&copy;2022//SDIS 29-58, avenue de Keradennec-29337 QUIMPER CEDEX-</small></p>
+                <p><small>&copy;2023, avenue de Keradennec-29337 QUIMPER CEDEX-</small></p>
                 <p>Tel : 02 98 10 31 50</p>
             </div>
               <p><small><?php if(isset($_COOKIE['visite'])) { echo $_COOKIE['visite']; } ?><small></p>
