@@ -52,4 +52,29 @@
     white-space: nowrap;
     -webkit-overflow-scrolling: touch;
   }
+
+/* Uniformiser la hauteur des cartes */
+.uniform-card {
+  width: 18rem;
+  height: 25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Conteneur fixe pour les images */
+.card-img-container {
+  height: 180px;          /* même hauteur pour toutes */
+  overflow: hidden;
+}
+
+/* Image recadrée sans déformation */
+.card-img-top {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;      /* zoom et recadre sans étirer */
+  object-position: center;
+}
+
+
 </style>
