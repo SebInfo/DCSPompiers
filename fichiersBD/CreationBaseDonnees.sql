@@ -194,7 +194,7 @@ CREATE TABLE `Habilitation` (
 
 LOCK TABLES `Habilitation` WRITE;
 /*!40000 ALTER TABLE `Habilitation` DISABLE KEYS */;
-INSERT INTO `Habilitation` VALUES (1,'conducteur de véhicule de secours routier (VSR)'),(2,'chef d\'agrès fourgon pompe-tonne (FPT)'),(3,'équipier incendie'),(4,'équipier échelle pivotante automatique'),(5,'conducteur de véhicule fourgon pompe-tonne (FPT)'),(6,'conducteur échelle pivotante automatique');
+INSERT INTO `Habilitation` VALUES (1,'conducteur de véhicule de secours routier (VSR)'),(2,'chef d\agrès fourgon pompe-tonne (FPT)'),(3,'équipier incendie'),(4,'équipier échelle pivotante automatique'),(5,'conducteur de véhicule fourgon pompe-tonne (FPT)'),(6,'conducteur échelle pivotante automatique');
 /*!40000 ALTER TABLE `Habilitation` ENABLE KEYS */;
 UNLOCK TABLES;
 

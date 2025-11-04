@@ -117,6 +117,12 @@ DB_PASS=IciVotreMotDePasse!
 > Projet réalisé dans le cadre du BTS SIO (option SLAM)  
 > Lycée — 2025
 
+## 👤 Colaborateur
+
+**Kylian Cattoire**  
+> Projet réalisé dans le cadre du BTS SIO (option SLAM)  
+> Lycée — 2025
+
 ---
 
 ## 📜 Licence
