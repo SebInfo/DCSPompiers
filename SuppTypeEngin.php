@@ -6,7 +6,7 @@
   }
   if(isset($_GET['id']) && isset($_GET['image']))
   {
-    require('include/connection.inc.php');
+    require('include/baseDonnees.php');
     $nomFichier = $_GET["image"];
     $req = $db->prepare('DELETE FROM DSC.TypeEngin WHERE idTypeEngin = :mid ');
     $req->bindParam(':mid', $_GET["id"]);
@@ -23,7 +23,7 @@
     }	
   }
 ?>
-<?php require('include/entete.inc.php');?>
+<?php require('include/entete.php');?>
   <main role="main">
     <?php echo generationEntete("Suppression d'un type Engin","Attention la suppression est définitive !!!"); ?>
     <div class="album py-5 bg-light">
@@ -52,4 +52,4 @@
       </div> 
     </div> 
   </main>
-<?php require('include/pied.inc.php');?>
+<?php require('include/pied.php');?>
