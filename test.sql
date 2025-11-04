@@ -15,7 +15,7 @@ async function connectDB() {
     return client.db(dbName).collection(collectionName);
   } catch (error) {
     console.error('Erreur de connexion à la base de données :', error);
-    throw error;
+    throw error.
   }
 }
 
