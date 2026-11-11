@@ -1,11 +1,11 @@
 <?php
 
 /**
- * Genere le code HTML de l'entête en dessous du menu
+ * Génère le bloc d'en-tête placé sous le menu.
  *
- * @param  string Titre de la page
- * @param  string Le sous titre
- * @return string
+ * @param string $titre Titre principal de la page.
+ * @param string $sous_titre Sous-titre affiché sous le titre.
+ * @return string Code HTML de l'en-tête.
  */
 function generationEntete(string $titre, string $sous_titre): string
 {
@@ -20,13 +20,13 @@ function generationEntete(string $titre, string $sous_titre): string
 }
 
 /**
- * Génère le code HTML avec Bootstrap pour les options dans une page
+ * Génère une carte Bootstrap représentant une option de navigation.
  *
- * @param  string Titre de l'option
- * @param  string Url de l'image (ex : images/imagesCarte/gestionEngin.jpeg )
- * @param  string Url où va pointer le bouton
- * @param  string Titre du bouton (falcultatif) Go si pas renseigné 
- * @return string Retourne le code HTML 
+ * @param string $titre Titre de l'option.
+ * @param string $url_image Nom de l'image dans images/imagesCarte.
+ * @param string $lien Page cible du lien.
+ * @param string $titre_boutons Texte affiché sur le bouton.
+ * @return string Code HTML de la carte.
  */
 function generationOptions(
     string $titre,

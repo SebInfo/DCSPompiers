@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 /**
  * Démarre la session si nécessaire.
+ *
+ * @return void
  */
 function demarrerSession(): void
 {
@@ -14,6 +16,8 @@ function demarrerSession(): void
 
 /**
  * Indique si un utilisateur est identifié.
+ *
+ * @return bool True si la session correspond à un utilisateur identifié.
  */
 function estConnecte(): bool
 {
@@ -24,6 +28,9 @@ function estConnecte(): bool
 
 /**
  * Protège une page réservée aux utilisateurs identifiés.
+ * Redirige vers la page de connexion si nécessaire.
+ *
+ * @return void
  */
 function exigerConnexion(): void
 {
@@ -35,6 +42,9 @@ function exigerConnexion(): void
 
 /**
  * Retourne le jeton CSRF de la session, ou en crée un.
+ *
+ * @return string Jeton CSRF associé à la session en cours.
+ * @throws Exception Si PHP ne peut pas générer de données aléatoires sûres.
  */
 function jetonCsrf(): string
 {
@@ -49,6 +59,9 @@ function jetonCsrf(): string
 
 /**
  * Vérifie le jeton envoyé par un formulaire qui modifie les données.
+ *
+ * @param string|null $jeton Jeton reçu dans le formulaire.
+ * @return bool True si le jeton correspond à celui de la session.
  */
 function jetonCsrfValide(?string $jeton): bool
 {

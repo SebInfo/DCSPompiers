@@ -5,6 +5,11 @@ declare(strict_types=1);
 /**
  * Enregistre une image dans le dossier images et retourne son nom.
  * Retourne null lorsqu'aucun fichier n'est envoyé.
+ *
+ * @param array<string, mixed> $fichier Données du fichier issues de $_FILES.
+ * @param string|null $erreur Message d'erreur complété si le téléversement échoue.
+ * @return string|null Nom de l'image enregistrée, ou null sans fichier ou en cas d'erreur.
+ * @throws Exception Si PHP ne peut pas générer de données aléatoires sûres.
  */
 function televerserImage(array $fichier, ?string &$erreur = null): ?string
 {
@@ -48,6 +53,9 @@ function televerserImage(array $fichier, ?string &$erreur = null): ?string
 
 /**
  * Supprime uniquement les images créées par l'application.
+ *
+ * @param string $nomFichier Nom de l'image à supprimer.
+ * @return void
  */
 function supprimerImageTeleversee(string $nomFichier): void
 {
