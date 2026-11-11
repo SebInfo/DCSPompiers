@@ -1,9 +1,7 @@
-<?php require('include/entete.php');?>
-<?
-  if($_SESSION['login']!=true)
-  {
-    header("Location:connexion.php");
-  }
+<?php
+require_once __DIR__ . '/include/controleAcces.php';
+exigerConnexion();
+require_once __DIR__ . '/include/entete.php';
 ?>
     <main role="main">
       <?php echo generationEntete("Les types engins","Voici la liste des types de véhicules que l'on peut trouver dans une caserne de pompiers."); ?>
@@ -21,8 +19,8 @@
                         <p class="card-text"> <?php echo ucwords($row["LblEngin"])?> </p>
                         <div class="d-flex justify-content-between align-items-center">
                           <div class="btn-group">
-                            <a href="ModifTypeEngin.php?id=<?php echo ($row["idTypeEngin"])?>" type="button" class="btn btn-sm btn-outline-secondary">Modifier</a>
-                            <a href="SuppTypeEngin.php?id=<?php echo ($row["idTypeEngin"])?>" type="button" class="btn btn-sm btn-outline-secondary">Supprimer</a>
+                            <a href="ModifTypeEngin.php?id=<?php echo urlencode($row["idTypeEngin"])?>" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                            <a href="suppTypeEngin.php?id=<?php echo urlencode($row["idTypeEngin"])?>" class="btn btn-sm btn-outline-secondary">Supprimer</a>
                           </div>
                         </div>
                       </div>
