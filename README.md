@@ -5,7 +5,7 @@
 **SDIS** est une application web développée dans le cadre du **BTS SIO – option SLAM**.  
 Elle a pour objectif de modéliser et de gérer les activités d’un **Service Départemental d’Incendie et de Secours (SDIS)**, ici inspiré du SDIS du Finistère.
 
-Ce projet a une vocation pédagogique : il illustre les principes fondamentaux du développement web en **PHP**, l’organisation d’un projet MVC simplifié, l’utilisation d’une **base de données MySQL**, et la gestion des sessions utilisateurs.
+Ce projet a une vocation pédagogique : il illustre les principes fondamentaux du développement web en **PHP procédural**, l’utilisation d’une **base de données MySQL** et la gestion des sessions utilisateurs.
 
 ---
 
@@ -33,7 +33,7 @@ Ce projet a une vocation pédagogique : il illustre les principes fondamentaux d
 | **Front-end** | HTML5, CSS3, Bootstrap 5 |
 | **Scripts** | JavaScript (validation formulaire + preview image) |
 | **Serveur local** | MAMP (macOS) ou XAMPP (Windows) |
-| **Normes de code** | PSR-12, PHPDoc |
+| **Conventions** | PHPDoc et conventions de présentation inspirées de PSR-12 |
 
 ---
 
@@ -102,13 +102,26 @@ DB_PASS=IciVotreMotDePasse!
 
 ---
 
-## 🧩 Bonnes pratiques et outils
+## 📖 Organisation et lisibilité du code
+
+Le code reste volontairement procédural pour rester adapté à un premier TP de BTS SIO SLAM.
+
+- Les pages PHP correspondent aux actions de l'application : ajouter, modifier ou supprimer.
+- Les éléments communs sont regroupés dans `include/` : connexion à la base, contrôle d'accès, fonctions HTML et téléversement d'images.
+- Les fonctions présentes dans `include/` disposent d'une PHPDoc avec leur rôle, leurs paramètres et leur valeur de retour.
+- Les traitements longs, comme l'ajout d'un pompier, sont découpés en étapes commentées : récupération, validation, insertion et redirection.
+
+Le projet n'utilise pas PSR-4 : cette norme concerne l'autoloading de classes avec Composer. Elle ne s'applique pas à cette application procédurale sans classes.
+
+---
+
+## 🧩 Vérifications utiles
 
 - **Qualité du code**
-  - Analyse : `phpcs --standard=PSR12 ./include`
-  - Correction auto : `phpcbf ./include`
+  - Vérifier la syntaxe : `find . -name '*.php' -print0 | xargs -0 -n1 php -l`
+  - PHPCS peut être ajouté ultérieurement pour contrôler les conventions PSR-12.
 - **Documentation**
-  - Tous les fichiers PHP incluent un en-tête PHPDoc conforme PSR-19.
+  - Les fonctions communes sont documentées avec PHPDoc.
 - **Sécurité**
   - Variables sensibles dans `.env`
   - Connexion PDO avec gestion d’erreurs
@@ -120,7 +133,7 @@ DB_PASS=IciVotreMotDePasse!
 
 **Sébastien Inion**  
 > Projet réalisé dans le cadre du BTS SIO (option SLAM)  
-> Lycée — 2025
+> Lycée — 2026
 
 ---
 
@@ -136,7 +149,7 @@ Vous êtes libre de l’utiliser, le modifier et le redistribuer à condition de
 Ce projet illustre :
 - Les bases de la programmation orientée serveur (PHP + MySQL)
 - L’importance de la modularisation (`include/`, `require_once`)
-- Le respect des standards du code (PSR-12)
+- La lecture d'une PHPDoc et de conventions de code simples
 - Les notions de sessions, cookies et formulaires sécurisés
 
 
