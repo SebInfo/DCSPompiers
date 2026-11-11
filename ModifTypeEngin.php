@@ -1,176 +1,117 @@
-<?php 
-session_start();
-if($_SESSION['login']!=true)
-{
-  header("Location:connexion.php");
+<?php
+
+require_once __DIR__ . '/include/controleAcces.php';
+require_once __DIR__ . '/include/televersement.php';
+exigerConnexion();
+require_once __DIR__ . '/include/baseDonnees.php';
+
+$idTypeEngin = $_GET['id'] ?? '';
+if (!preg_match('/^[A-Z]{2,4}$/', $idTypeEngin)) {
+    header('Location: GestionTypeEngin.php');
+    exit;
 }
-require('include/baseDonnees.php');
-if(isset($_POST['valider']))
-{
-  $ancienNom = $_GET['nom'];
-  // On récupère les valeurs qu'il y avait dans le formulaire
-	$LblEngin = $_POST['LblEngin'];
-	$idTypeEngin =  $_GET['id'];
-	
 
-	// On va maintenant effectuer les tests
-	$erreur = False; // on est optimiste
-	
-	// Traitement de la photo
-  	if (isset($_FILES) && count($_FILES)>0)
-  	{
-	    $urlPhoto = $_FILES['image'];
-	    $nom_fichier = $urlPhoto['name'];
-	    if (strlen($nom_fichier)==0) 
-	    {
-	      $nom_fichier="user.png";
-	    }
-  	}
-  	else
-  	{
-  		$erreur = True;
-  	}
+$requete = $db->prepare(
+    'SELECT idTypeEngin, LblEngin, image
+     FROM DSC.TypeEngin
+     WHERE idTypeEngin = :idTypeEngin'
+);
+$requete->execute([':idTypeEngin' => $idTypeEngin]);
+$engin = $requete->fetch();
 
-	// tests sur l'id'
-	if (!isset($idTypeEngin) || strlen($idTypeEngin)>4) 
-	{
-		$erreur = True;
-	}
-
-	// tests sur le libelle
-	if (!isset($LblEngin) || strlen($LblEngin)<3 || strlen($LblEngin)>45 || !is_string($LblEngin))
-	{
-		$erreur = True;
-	}
-	
-	// Ajout si pas d'erreur
-	if( ! $erreur )
-	{
-
-		// Préparation de la requête principale
-		$req = $db->prepare('UPDATE DSC.TypeEngin SET LblEngin=:mLblEngin, image=:mimage WHERE idTypeEngin=:midTypeEngin');
-
-		// On va utiliser bind pour lier les variables PHP au paramètre :m de prépare
-		$req->bindParam(':midTypeEngin', $idTypeEngin, PDO::PARAM_STR);
-		$req->bindParam(':mLblEngin', $LblEngin, PDO::PARAM_STR);
-		$req->bindParam(':mimage',  $nom_fichier, PDO::PARAM_STR);
-
-		// On tente avec un try d'executer la requête
-		try
-		{
-			$req->execute();
-			// On déplace l'image dans le répertoire
-			unlink("images/".$ancienNom);
-			move_uploaded_file($urlPhoto['tmp_name'],'images/'.$nom_fichier);
-      		header('Location: GestionTypeEngin.php');
-		}
-		catch(PDOException $e)
-		{
-			if ($e->getCode()==23000)
-			{
-				echo "Cet id d'engin existe déjà";
-			}
-			else
-			{
-				echo $e->getMessage();
-			}
-		}	
-	}
-	else
-	{
-		echo "On a trouvé des erreurs dans le filtrage des informations";
-	}
+if ($engin === false) {
+    header('Location: GestionTypeEngin.php');
+    exit;
 }
-else
-{
-  require('include/entete.php');
-    echo generationEntete("Modification d'un type Engin","Modifier les champs qui vous semble utile !"); 
+
+$erreur = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $libelleEngin = trim($_POST['LblEngin'] ?? '');
+
+    if (!jetonCsrfValide($_POST['jeton_csrf'] ?? null)) {
+        $erreur = 'Le formulaire a expiré. Veuillez recommencer.';
+    } elseif (mb_strlen($libelleEngin) < 3 || mb_strlen($libelleEngin) > 45) {
+        $erreur = 'Le libellé doit contenir entre 3 et 45 caractères.';
+    } else {
+        $nouvelleImage = televerserImage($_FILES['image'] ?? [], $erreur);
+        $nomFichier = $nouvelleImage ?? $engin['image'];
+
+        if ($erreur === '') {
+            try {
+                $requete = $db->prepare(
+                    'UPDATE DSC.TypeEngin
+                     SET LblEngin = :libelleEngin, image = :image
+                     WHERE idTypeEngin = :idTypeEngin'
+                );
+                $requete->execute([
+                    ':libelleEngin' => $libelleEngin,
+                    ':image' => $nomFichier,
+                    ':idTypeEngin' => $idTypeEngin,
+                ]);
+
+                if ($nouvelleImage !== null) {
+                    supprimerImageTeleversee($engin['image']);
+                }
+
+                header('Location: GestionTypeEngin.php');
+                exit;
+            } catch (PDOException $exception) {
+                if ($nouvelleImage !== null) {
+                    supprimerImageTeleversee($nouvelleImage);
+                }
+                $erreur = "L'engin n'a pas pu être modifié.";
+            }
+        }
+    }
 }
+
+require_once __DIR__ . '/include/entete.php';
 ?>
-    <main role="main">
-      <div class="album py-5 bg-light">
-        <div class="container">
-          <div class="row justify-content-center">
-          <?php
-                $id=$_GET["id"];
-                $leTypeEngin = "SELECT idTypeEngin, LblEngin, image FROM DSC.TypeEngin WHERE idTypeEngin='$id';";
-                foreach ($db->query($leTypeEngin) as $row) 
-                {?>            
-                  <div class="col-md-4">
-                    <div class="card mb-4 box-shadow">
-                      <img class="card-img-top" id="photo" src="images/<?php echo $row["image"]?>" alt="Card image cap">
-                      <div class="card-body">
-                        <p class="card-text"> <?php echo ucwords($row["LblEngin"])?> </p>
-                      </div>
-                    </div>
-                  </div>        
-                <?php }
-          ?>
+<main role="main">
+  <?php echo generationEntete("Modification d'un type d'engin", 'Modifiez le libellé et, si nécessaire, la photo.'); ?>
+  <div class="container">
+    <?php if ($erreur !== '') : ?>
+      <div class="alert alert-danger"><?php echo htmlspecialchars($erreur, ENT_QUOTES, 'UTF-8'); ?></div>
+    <?php endif; ?>
+    <div class="album py-5 bg-light">
+      <div class="row justify-content-center">
+        <div class="col-md-4">
+          <div class="card mb-4 box-shadow">
+            <img class="card-img-top" id="photo" src="images/<?php echo htmlspecialchars($engin['image'], ENT_QUOTES, 'UTF-8'); ?>" alt="Aperçu de l'engin">
+            <div class="card-body">
+              <p class="card-text"><?php echo htmlspecialchars(ucwords($engin['LblEngin']), ENT_QUOTES, 'UTF-8'); ?></p>
+            </div>
           </div>
         </div>
       </div>
-    </main>
-    <div class="container">
-    <form method="post" action="ModifTypeEngin.php?nom=<?php echo ($row["image"])?>&id=<?php echo($row["idTypeEngin"])?>" id="form" enctype="multipart/form-data" novalidate>
-        <div class="form-row">
-          <div class="form-control-group col-md-3">
-            <label for="idTypeEngin">Identifiant  (champ non modifiable)</label>
-            <input pattern="[A-Z]{2,4}" disabled="disabled" class="form-control" value="<?php echo ($row["idTypeEngin"])?>" name="idTypeEngin" id="idTypeEngin" placeholder="Ex : EPA" required>
-            <div class="invalid-feedback">
-              L'id du type Véhicule est obligatoire ( Il est constitué de 3 à 4 caractère en majuscule )
-            </div>
-          </div>
+    </div>
+    <form method="post" action="ModifTypeEngin.php?id=<?php echo urlencode($engin['idTypeEngin']); ?>" id="form" enctype="multipart/form-data" novalidate>
+      <input type="hidden" name="jeton_csrf" value="<?php echo htmlspecialchars(jetonCsrf(), ENT_QUOTES, 'UTF-8'); ?>">
+      <div class="form-row">
+        <div class="form-control-group col-md-3">
+          <label for="idTypeEngin">Identifiant</label>
+          <input class="form-control" value="<?php echo htmlspecialchars($engin['idTypeEngin'], ENT_QUOTES, 'UTF-8'); ?>" id="idTypeEngin" disabled>
         </div>
-        <div class="form-row">
-          <div class="form-group col-md-3">
-            <label for="image">Photo</label>
-            <input type="file" onchange="actuPhoto(this)" id="image" name="image" accept="image/jpeg, image/png, image/gif">
-            <div class="invalid-feedback">
-              La photo est obligatoire
-            </div>
-          </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-3">
+          <label for="image">Nouvelle photo (facultative)</label>
+          <input type="file" onchange="actuPhoto(this)" id="image" name="image" accept="image/jpeg, image/png, image/gif">
+          <div class="form-text">JPEG, PNG ou GIF, 2 Mo maximum.</div>
         </div>
-        <div class="form-row">
-          <div class="form-control-group col-md-6">
-            <label for="LblEngin">Libellé de l'engin</label>
-            <input class="form-control" name="LblEngin" value="<?php echo ucwords($row["LblEngin"])?>" id="LblEngin" required>
-            <div class="invalid-feedback">
-              Le libellé de l'engin est obligatoire
-            </div>
-          </div>
+      </div>
+      <div class="form-row">
+        <div class="form-control-group col-md-6">
+          <label for="LblEngin">Libellé de l'engin</label>
+          <input class="form-control" name="LblEngin" value="<?php echo htmlspecialchars($engin['LblEngin'], ENT_QUOTES, 'UTF-8'); ?>" id="LblEngin" minlength="3" maxlength="45" required>
+          <div class="invalid-feedback">Le libellé doit contenir entre 3 et 45 caractères.</div>
         </div>
-        <div class="form-row">
-          <input type="submit" value="Modifier" class="btn btn-primary" name="valider" />
-        </div>
+      </div>
+      <div class="form-row">
+        <input type="submit" value="Modifier" class="btn btn-primary" name="valider">
+      </div>
     </form>
-  	</div>
- 
-  	<script>
-     (function() {
-        "use strict"
-        window.addEventListener("load", function() {
-          var form = document.getElementById("form")
-          form.addEventListener("submit", function(event) {
-            if (form.checkValidity() == false) {
-              event.preventDefault()
-              event.stopPropagation()
-            }
-            form.classList.add("was-validated")
-          }, false)
-        }, false)
-
-      }())
-
-      function actuPhoto(element)
-      {
-        var image=document.getElementById("image");
-        var fReader = new FileReader();
-        fReader.readAsDataURL(image.files[0]);
-        fReader.onloadend = function(event)
-        {
-          var img = document.getElementById("photo");
-          img.src = event.target.result;
-        }
-      }
-    </script>
-<?php require('include/pied.php');?>
+  </div>
+</main>
+<?php require __DIR__ . '/include/pied.php'; ?>
