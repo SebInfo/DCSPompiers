@@ -1,6 +1,10 @@
 <?php
-session_start();
+
+require_once __DIR__ . '/include/controleAcces.php';
+demarrerSession();
+
+$_SESSION = [];
 session_destroy();
-unset($_SESSION);
+
 header('Location: index.php');
-?>
+exit;
