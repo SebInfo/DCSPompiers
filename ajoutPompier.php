@@ -7,6 +7,7 @@ require_once __DIR__ . '/include/baseDonnees.php';
 $erreur = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Récupération des données communes aux deux types de pompier.
     $matricule = trim($_POST['matricule'] ?? '');
     $nom = trim($_POST['nom'] ?? '');
     $prenom = trim($_POST['prenom'] ?? '');
@@ -21,12 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $indice = filter_input(INPUT_POST, 'indice', FILTER_VALIDATE_INT);
     $idCaserne = filter_input(INPUT_POST, 'caserne', FILTER_VALIDATE_INT);
 
+    // Préparation des contrôles de validité pour rendre la condition suivante lisible.
     $dateNaissanceValide = DateTime::createFromFormat('Y-m-d', $dateNaissance);
     $dateEmbaucheValide = DateTime::createFromFormat('Y-m-d', $dateEmbauche);
-
-    if (!jetonCsrfValide($_POST['jeton_csrf'] ?? null)) {
-        $erreur = 'Le formulaire a expiré. Veuillez recommencer.';
-    } elseif (!preg_match('/^\d{6}$/', $matricule)
+    $informationsCommunesInvalides = !preg_match('/^\d{6}$/', $matricule)
         || mb_strlen($nom) < 3 || mb_strlen($nom) > 45
         || mb_strlen($prenom) < 3 || mb_strlen($prenom) > 45
         || !$dateNaissanceValide || $dateNaissanceValide->format('Y-m-d') !== $dateNaissance
@@ -34,18 +33,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         || !in_array($sexe, ['féminin', 'masculin'], true)
         || !is_int($grade) || $grade < 1
         || !is_int($idCaserne) || $idCaserne < 1
-        || !in_array($type, ['volontaire', 'professionnel'], true)) {
+        || !in_array($type, ['volontaire', 'professionnel'], true);
+    $informationsVolontaireInvalides = $type === 'volontaire'
+        && (!preg_match('/^\d{0,3}$/', $bip)
+            || ($idEmployeur !== null && (!is_int($idEmployeur) || $idEmployeur < 1)));
+    $informationsProfessionnelInvalides = $type === 'professionnel'
+        && (!is_int($indice) || $indice < 0
+            || !$dateEmbaucheValide || $dateEmbaucheValide->format('Y-m-d') !== $dateEmbauche);
+
+    if (!jetonCsrfValide($_POST['jeton_csrf'] ?? null)) {
+        $erreur = 'Le formulaire a expiré. Veuillez recommencer.';
+    } elseif ($informationsCommunesInvalides) {
         $erreur = 'Certaines informations du formulaire sont incorrectes.';
-    } elseif ($type === 'volontaire' && (!preg_match('/^\d{0,3}$/', $bip)
-        || ($idEmployeur !== null && (!is_int($idEmployeur) || $idEmployeur < 1)))) {
+    } elseif ($informationsVolontaireInvalides) {
         $erreur = 'Les informations du pompier volontaire sont incorrectes.';
-    } elseif ($type === 'professionnel' && (!is_int($indice) || $indice < 0
-        || !$dateEmbaucheValide || $dateEmbaucheValide->format('Y-m-d') !== $dateEmbauche)) {
+    } elseif ($informationsProfessionnelInvalides) {
         $erreur = 'Les informations du pompier professionnel sont incorrectes.';
     } else {
         try {
             $db->beginTransaction();
 
+            // Insertion des informations communes.
             $requete = $db->prepare(
                 'INSERT INTO DSC.Pompier
                 (Matricule, NomPompier, PrenomPompier, DateNaissPompier, TelPompier, SexePompier, idGrade)
@@ -62,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
 
             if ($type === 'volontaire') {
+                // Insertion des informations spécifiques à un volontaire.
                 $requete = $db->prepare(
                     'INSERT INTO DSC.Volontaire (MatVolontaire, Bip, IdEmployeur)
                     VALUES (:matricule, :bip, :idEmployeur)'
@@ -72,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ':idEmployeur' => is_int($idEmployeur) ? $idEmployeur : null,
                 ]);
             } else {
+                // Insertion des informations spécifiques à un professionnel.
                 $requete = $db->prepare(
                     'INSERT INTO DSC.Professionnel (MatPro, DateEmbauche, Indice)
                     VALUES (:matricule, :dateEmbauche, :indice)'
@@ -83,6 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
             }
 
+            // Une nouvelle affectation est créée à la date du jour.
             $requete = $db->prepare(
                 'INSERT INTO DSC.Affectation (Matricule, DateAff, IdCaserne)
                 VALUES (:matricule, :dateAffectation, :idCaserne)'
@@ -114,21 +125,11 @@ require_once __DIR__ . '/include/entete.php';
 
 <main>
   <script>
-    function aff_cach_input(action)
-    { 
-      // Cas volontaire (bouton radio)
-      if (action == "volontaire") 
-      {
-          document.getElementById('blockVolontaire').style.display="inline"; 
-          document.getElementById('blockPro').style.display="none"; 
-      }
-      else if (action == "pro")
-      // Cas professionnel (bouton radio)
-      {
-          document.getElementById('blockVolontaire').style.display="none"; 
-          document.getElementById('blockPro').style.display="inline"; 
-      }
-      return true;
+    function afficherChampsSelonType(typePompier) {
+      const estVolontaire = typePompier === 'volontaire';
+
+      document.getElementById('blockVolontaire').style.display = estVolontaire ? 'block' : 'none';
+      document.getElementById('blockPro').style.display = estVolontaire ? 'none' : 'block';
     }
   </script>
   <div class="container">
@@ -157,7 +158,7 @@ require_once __DIR__ . '/include/entete.php';
         <div class="form-row">
           <div class="form-control-group col-md-6">
             <label for="nom">Nom</label>
-            <input pattern="[A-Za-zéèà-]{3,45}" class="form-control" name="nom" id="Nom" required>
+            <input pattern="[A-Za-zéèà-]{3,45}" class="form-control" name="nom" id="nom" required>
             <div class="invalid-feedback">
               Le nom du pompier est obligatoire (minimum 3 caractères maximum 45)
             </div>
@@ -240,11 +241,11 @@ require_once __DIR__ . '/include/entete.php';
           <div class="form-control-group col-md-12">
             <label class="md-3" for="type">Type pompier  :</label>
             <div class="custom-control custom-radio custom-control-inline">
-              <input type="radio" class="custom-control-input" id="pro" name="type" value="professionnel" onchange="aff_cach_input('pro')">
+              <input type="radio" class="custom-control-input" id="pro" name="type" value="professionnel" onchange="afficherChampsSelonType('professionnel')">
               <label class="custom-control-label" for="pro">Professionnel</label>
             </div>
             <div class="custom-control custom-radio custom-control-inline">
-              <input type="radio" class="custom-control-input"  id="volontaire" name="type" value="volontaire" onchange="aff_cach_input('volontaire')" checked>
+              <input type="radio" class="custom-control-input" id="volontaire" name="type" value="volontaire" onchange="afficherChampsSelonType('volontaire')" checked>
               <label class="custom-control-label" for="volontaire">Volontaire</label>
             </div>   
             <div class="invalid-feedback">
@@ -261,8 +262,8 @@ require_once __DIR__ . '/include/entete.php';
               <div class="form-group">
                 <select class="form-control col-md-6" name="employeur" id="employeur">
                   <?php
-                    $listeGrade = "SELECT idEmployeur, NomEmployeur FROM DSC.Employeur;";
-                    foreach  ($db->query($listeGrade) as $row) {
+                    $listeEmployeurs = "SELECT idEmployeur, NomEmployeur FROM DSC.Employeur;";
+                    foreach ($db->query($listeEmployeurs) as $row) {
                       echo '<option value="'.(int) $row["idEmployeur"].'">'.htmlspecialchars(ucwords($row["NomEmployeur"]), ENT_QUOTES, 'UTF-8').'</option>';
                     }
                   ?>
@@ -291,10 +292,10 @@ require_once __DIR__ . '/include/entete.php';
                 </div>
             </div>
             <div class="form">
-                <label for="dateEmbauche">Date d'embauche'</label>
+                <label for="dateEmbauche">Date d'embauche</label>
                 <input type="date" class="form-control" name="dateEmbauche" id="dateEmbauche" >
                 <div class="invalid-feedback">
-                  La date d'embauche est obligatoire'
+                  La date d'embauche est obligatoire
                 </div>
             </div>
           </div> 
@@ -305,7 +306,7 @@ require_once __DIR__ . '/include/entete.php';
         </div>
 
         <script>
-                aff_cach_input('volontaire');
+                afficherChampsSelonType('volontaire');
         </script>
 
       </form>
