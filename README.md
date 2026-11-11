@@ -40,13 +40,18 @@ Ce projet a une vocation pédagogique : il illustre les principes fondamentaux d
 ## 📂 Structure du projet
 
 ```
-DSCPompier2025/
+DSCPompier2026/
 ├── include/
 │   ├── entete.php
 │   ├── pied.php
-│   ├── connection.php
+│   ├── baseDonnees.php
+│   ├── controleAcces.php
 │   ├── mesFonctions.php
-│   ├── svg.php
+│   ├── televersement.php
+│   ├── svg.html
+│   └── .env.example
+├── fichiersBD/
+│   └── DSC.sql
 ├── images/
 │   └── imagesCarte/
 ├── css/
@@ -55,20 +60,19 @@ DSCPompier2025/
 │   └── app.js
 ├── index.php
 ├── README.md
-└── .env
 ```
 
 ---
 
 ## 🔐 Configuration de la base de données
 
-Le fichier **`.env`** contient les informations de connexion à la base MySQL.  
+Le fichier **`include/.env`** contient les informations de connexion à la base MySQL.
 ⚠️ Ce fichier ne doit **jamais être versionné** (ajouté à `.gitignore`).
 
 Exemple :
 ```ini
 DB_HOST=127.0.0.1
-DB_PORT=8888
+DB_PORT=8889
 DB_NAME=DSC
 DB_USER=userDSC
 DB_PASS=IciVotreMotDePasse!
@@ -80,20 +84,21 @@ DB_PASS=IciVotreMotDePasse!
 
 1. **Cloner le projet**
    ```bash
-   git clone https://github.com/SebInfo/DSCPompier2025.git
-   cd DSCPompier2025
+   git clone https://github.com/SebInfo/DSCPompier2026.git
+   cd DSCPompier2026
    ```
 
 2. **Configurer l’environnement**
-   - Copier le fichier `.env.example` vers `.env`
+   - Copier le fichier `include/.env.example` vers `include/.env`
    - Modifier les paramètres selon ta configuration MAMP/XAMPP
 
 3. **Créer la base de données**
-   - Importer le fichier `test.sql` (ou `schema.sql`) dans phpMyAdmin.
+   - Créer une base nommée `DSC` dans phpMyAdmin.
+   - Importer le fichier `fichiersBD/DSC.sql` dans cette base.
 
 4. **Lancer le serveur local**
    - Sous MAMP, placer le projet dans le dossier `htdocs`
-   - Accéder à : [http://localhost:8888/DSCPompier2025](http://localhost:8888/DSCPompier2025)
+   - Accéder à : [http://localhost:8888/DSCPompier2026](http://localhost:8888/DSCPompier2026)
 
 ---
 
