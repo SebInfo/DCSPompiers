@@ -32,14 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         || !$dateNaissanceValide || $dateNaissanceValide->format('Y-m-d') !== $dateNaissance
         || !preg_match('/^\d{10}$/', $tel)
         || !in_array($sexe, ['féminin', 'masculin'], true)
-        || $grade === false || $grade < 1
-        || $idCaserne === false || $idCaserne < 1
+        || !is_int($grade) || $grade < 1
+        || !is_int($idCaserne) || $idCaserne < 1
         || !in_array($type, ['volontaire', 'professionnel'], true)) {
         $erreur = 'Certaines informations du formulaire sont incorrectes.';
     } elseif ($type === 'volontaire' && (!preg_match('/^\d{0,3}$/', $bip)
-        || ($idEmployeur !== false && $idEmployeur < 1))) {
+        || ($idEmployeur !== null && (!is_int($idEmployeur) || $idEmployeur < 1)))) {
         $erreur = 'Les informations du pompier volontaire sont incorrectes.';
-    } elseif ($type === 'professionnel' && ($indice === false || $indice < 0
+    } elseif ($type === 'professionnel' && (!is_int($indice) || $indice < 0
         || !$dateEmbaucheValide || $dateEmbaucheValide->format('Y-m-d') !== $dateEmbauche)) {
         $erreur = 'Les informations du pompier professionnel sont incorrectes.';
     } else {
@@ -69,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $requete->execute([
                     ':matricule' => $matricule,
                     ':bip' => $bip,
-                    ':idEmployeur' => $idEmployeur === false ? null : $idEmployeur,
+                    ':idEmployeur' => is_int($idEmployeur) ? $idEmployeur : null,
                 ]);
             } else {
                 $requete = $db->prepare(
