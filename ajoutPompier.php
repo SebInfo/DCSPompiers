@@ -1,148 +1,114 @@
 <?php
-// ==========================
-// 1. Contrôle d’accès
-// ==========================
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 
-if (empty($_SESSION['login']) || $_SESSION['login'] !== true) {
-    header('Location: connexion.php');
-    exit;
-}
-
-// ==========================
-// 2. Traitement du formulaire
-// ==========================
-$insertionOK = false;
-$erreur = false;
+require_once __DIR__ . '/include/controleAcces.php';
+exigerConnexion();
 require_once __DIR__ . '/include/baseDonnees.php';
-if (isset($_POST['validerP'])) 
-{
-    $matricule = filter_input(INPUT_POST, 'matricule', FILTER_UNSAFE_RAW);
-    if (!preg_match('/^\d{6}$/', $matricule)) {
-      $erreur = true;
-    }
-    $erreur = false;
 
-    $nom = filter_input(INPUT_POST, 'nom', FILTER_SANITIZE_SPECIAL_CHARS);
-    $prenom = filter_input(INPUT_POST, 'prenom', FILTER_SANITIZE_SPECIAL_CHARS);
-    $dateNaissance = $_POST['dateNaissance'] ?? null;
-    $tel = $_POST['tel'] ?? '';
+$erreur = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $matricule = trim($_POST['matricule'] ?? '');
+    $nom = trim($_POST['nom'] ?? '');
+    $prenom = trim($_POST['prenom'] ?? '');
+    $dateNaissance = $_POST['dateNaissance'] ?? '';
+    $tel = trim($_POST['tel'] ?? '');
     $sexe = $_POST['sexe'] ?? '';
-    $grade = $_POST['grade'] ?? '';
+    $grade = filter_input(INPUT_POST, 'grade', FILTER_VALIDATE_INT);
     $type = $_POST['type'] ?? '';
-    $bip = substr($_POST['bip'] ?? '', 0, 3);
-    $idEmployeur = $_POST['employeur'] ?? null;
-    $dateEmbauche = $_POST['dateEmbauche'] ?? null;
-    $indice = $_POST['indice'] ?? null;
-    $idCaserne = $_POST['caserne'] ?? null;
+    $bip = trim($_POST['bip'] ?? '');
+    $idEmployeur = filter_input(INPUT_POST, 'employeur', FILTER_VALIDATE_INT);
+    $dateEmbauche = $_POST['dateEmbauche'] ?? '';
+    $indice = filter_input(INPUT_POST, 'indice', FILTER_VALIDATE_INT);
+    $idCaserne = filter_input(INPUT_POST, 'caserne', FILTER_VALIDATE_INT);
 
-    if (strlen($matricule) !== 6 || !ctype_digit($matricule)) $erreur = true;
-    if (strlen($nom) < 3 || strlen($nom) > 45) $erreur = true;
-    if (strlen($prenom) < 3 || strlen($prenom) > 45) $erreur = true;
+    $dateNaissanceValide = DateTime::createFromFormat('Y-m-d', $dateNaissance);
+    $dateEmbaucheValide = DateTime::createFromFormat('Y-m-d', $dateEmbauche);
 
-    if (!$erreur) 
-    {
+    if (!jetonCsrfValide($_POST['jeton_csrf'] ?? null)) {
+        $erreur = 'Le formulaire a expiré. Veuillez recommencer.';
+    } elseif (!preg_match('/^\d{6}$/', $matricule)
+        || mb_strlen($nom) < 3 || mb_strlen($nom) > 45
+        || mb_strlen($prenom) < 3 || mb_strlen($prenom) > 45
+        || !$dateNaissanceValide || $dateNaissanceValide->format('Y-m-d') !== $dateNaissance
+        || !preg_match('/^\d{10}$/', $tel)
+        || !in_array($sexe, ['féminin', 'masculin'], true)
+        || $grade === false || $grade < 1
+        || $idCaserne === false || $idCaserne < 1
+        || !in_array($type, ['volontaire', 'professionnel'], true)) {
+        $erreur = 'Certaines informations du formulaire sont incorrectes.';
+    } elseif ($type === 'volontaire' && (!preg_match('/^\d{0,3}$/', $bip)
+        || ($idEmployeur !== false && $idEmployeur < 1))) {
+        $erreur = 'Les informations du pompier volontaire sont incorrectes.';
+    } elseif ($type === 'professionnel' && ($indice === false || $indice < 0
+        || !$dateEmbaucheValide || $dateEmbaucheValide->format('Y-m-d') !== $dateEmbauche)) {
+        $erreur = 'Les informations du pompier professionnel sont incorrectes.';
+    } else {
         try {
             $db->beginTransaction();
 
-            // Insertion du pompier
-            $req = $db->prepare('
-                INSERT INTO DSC.Pompier 
+            $requete = $db->prepare(
+                'INSERT INTO DSC.Pompier
                 (Matricule, NomPompier, PrenomPompier, DateNaissPompier, TelPompier, SexePompier, idGrade)
-                VALUES (:mat, :nom, :prenom, :naiss, :tel, :sexe, :grade)
-            ');
-            $req->execute([
-                ':mat' => $matricule,
+                VALUES (:matricule, :nom, :prenom, :dateNaissance, :tel, :sexe, :grade)'
+            );
+            $requete->execute([
+                ':matricule' => $matricule,
                 ':nom' => $nom,
                 ':prenom' => $prenom,
-                ':naiss' => $dateNaissance,
+                ':dateNaissance' => $dateNaissance,
                 ':tel' => $tel,
                 ':sexe' => $sexe,
-                ':grade' => $grade
+                ':grade' => $grade,
             ]);
 
             if ($type === 'volontaire') {
-                $req = $db->prepare('
-                    INSERT INTO DSC.Volontaire (MatVolontaire, Bip, IdEmployeur)
-                    VALUES (:mat, :bip, :emp)
-                ');
-                $req->execute([':mat' => $matricule, ':bip' => $bip, ':emp' => $idEmployeur]);
-            } elseif ($type === 'professionnel') {
-                $req = $db->prepare('
-                    INSERT INTO DSC.Professionnel (MatPro, DateEmbauche, Indice)
-                    VALUES (:mat, :emb, :ind)
-                ');
-                $req->execute([':mat' => $matricule, ':emb' => $dateEmbauche, ':ind' => $indice]);
+                $requete = $db->prepare(
+                    'INSERT INTO DSC.Volontaire (MatVolontaire, Bip, IdEmployeur)
+                    VALUES (:matricule, :bip, :idEmployeur)'
+                );
+                $requete->execute([
+                    ':matricule' => $matricule,
+                    ':bip' => $bip,
+                    ':idEmployeur' => $idEmployeur === false ? null : $idEmployeur,
+                ]);
+            } else {
+                $requete = $db->prepare(
+                    'INSERT INTO DSC.Professionnel (MatPro, DateEmbauche, Indice)
+                    VALUES (:matricule, :dateEmbauche, :indice)'
+                );
+                $requete->execute([
+                    ':matricule' => $matricule,
+                    ':dateEmbauche' => $dateEmbauche,
+                    ':indice' => $indice,
+                ]);
             }
 
-            // Affectation
-            $req = $db->prepare('
-                INSERT INTO DSC.Affectation (Matricule, DateAff, IdCaserne)
-                VALUES (:mat, :date, :cas)
-            ');
-            $req->execute([
-                ':mat' => $matricule,
-                ':date' => date('Y-m-d'),
-                ':cas' => $idCaserne
-            ]);
-            // On valide l'ajout
-            $db->commit();
-            require_once 'include/entete.php';
-            ?>
-            <!-- Ecran pour indiquer que l'ajout c'est bien déroulé -->
-            <main class="d-flex flex-column justify-content-center align-items-center" style="height: 70vh;">
-                <div class="alert alert-success text-center p-5 shadow-lg">
-                    <h2 class="mb-3">✅ Ajout du pompier effectué avec succès !</h2>
-                    <p>Vous allez être redirigé vers la liste des pompiers dans <strong>5 secondes</strong>...</p>
-                    <div class="spinner-border text-success mt-3" role="status">
-                        <span class="visually-hidden">Redirection...</span>
-                    </div>
-                    <p class="mt-4">
-                        <a href="lesPompiers.php" class="btn btn-primary">Redirection immédiate</a>
-                    </p>
-                </div>
-            </main>
-
-            <script>
-                // Redirection automatique après 5 secondes vers la page gérant les pompiers
-                setTimeout(() => {
-                    window.location.href = 'lesPompiers.php';
-                }, 5000);
-            </script>
-
-            <?php
-            require_once 'include/pied.php';
-            exit;
-        } 
-        catch (PDOException $e) 
-        {
-            // Création du chemin du fichier log
-            $logFile = __DIR__ . '/logs/app_errors.log';
-
-            // Formatage du message
-            $message = sprintf(
-              "[%s] Erreur PDO : %s dans %s ligne %d%s",
-              date('Y-m-d H:i:s'),
-              $e->getMessage(),
-              $e->getFile(),
-              $e->getLine(),
-              PHP_EOL
+            $requete = $db->prepare(
+                'INSERT INTO DSC.Affectation (Matricule, DateAff, IdCaserne)
+                VALUES (:matricule, :dateAffectation, :idCaserne)'
             );
-            // Écriture dans le fichier
-            error_log($message, 3, $logFile);
+            $requete->execute([
+                ':matricule' => $matricule,
+                ':dateAffectation' => date('Y-m-d'),
+                ':idCaserne' => $idCaserne,
+            ]);
 
-            echo "<div class='alert alert-danger'>Erreur lors de l’insertion (voir logs/app_errors.log)</div>";
-        } 
-    }
-    else 
-    {
-        echo "<div class='alert alert-warning'>Erreur dans le formulaire.</div>";
+            $db->commit();
+            $_SESSION['message_succes'] = 'Le pompier a été ajouté.';
+            header('Location: lesPompiers.php');
+            exit;
+        } catch (PDOException $exception) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+
+            error_log($exception->getMessage());
+            $erreur = 'Erreur lors de l’insertion du pompier.';
+        }
     }
 }
 
-require_once 'include/entete.php';
+require_once __DIR__ . '/include/entete.php';
 ?>
 
 
@@ -166,8 +132,12 @@ require_once 'include/entete.php';
     }
   </script>
   <div class="container">
-    <?php echo generationEntete("Ajout d'un pompier","Ajour d'une pompier et affectation à une caserne"); ?>
+    <?php echo generationEntete("Ajout d'un pompier", "Ajout d'un pompier et affectation à une caserne"); ?>
+    <?php if ($erreur !== '') : ?>
+      <div class="alert alert-danger"><?php echo htmlspecialchars($erreur, ENT_QUOTES, 'UTF-8'); ?></div>
+    <?php endif; ?>
       <form method="post" action="ajoutPompier.php" id="form" novalidate>
+        <input type="hidden" name="jeton_csrf" value="<?php echo htmlspecialchars(jetonCsrf(), ENT_QUOTES, 'UTF-8'); ?>">
         <div class="form-row">
           <div class="form-control-group col-md-3">
             <label for="matricule">Matricule</label>
@@ -229,7 +199,7 @@ require_once 'include/entete.php';
                 <?php
                   $listeGrade = "SELECT idGrade, LblGrade FROM DSC.Grade;";
                   foreach  ($db->query($listeGrade) as $row) {
-                    echo '<option value="'.$row["idGrade"].'">'.ucwords($row["LblGrade"]).'</option>';
+                    echo '<option value="'.(int) $row["idGrade"].'">'.htmlspecialchars(ucwords($row["LblGrade"]), ENT_QUOTES, 'UTF-8').'</option>';
                   }
                 ?>
               </select>
@@ -246,7 +216,7 @@ require_once 'include/entete.php';
                 <?php
                   $listeCaserne = "SELECT idCaserne, NomCaserne FROM DSC.Caserne;";
                   foreach  ($db->query($listeCaserne) as $row) {
-                    echo '<option value="'.$row["idCaserne"].'">'.ucwords($row["NomCaserne"]).'</option>';
+                    echo '<option value="'.(int) $row["idCaserne"].'">'.htmlspecialchars(ucwords($row["NomCaserne"]), ENT_QUOTES, 'UTF-8').'</option>';
                   }
                 ?>
               </select>
@@ -293,7 +263,7 @@ require_once 'include/entete.php';
                   <?php
                     $listeGrade = "SELECT idEmployeur, NomEmployeur FROM DSC.Employeur;";
                     foreach  ($db->query($listeGrade) as $row) {
-                      echo '<option value="'.$row["idEmployeur"].'">'.ucwords($row["NomEmployeur"]).'</option>';
+                      echo '<option value="'.(int) $row["idEmployeur"].'">'.htmlspecialchars(ucwords($row["NomEmployeur"]), ENT_QUOTES, 'UTF-8').'</option>';
                     }
                   ?>
                 </select>
