@@ -65,9 +65,26 @@
 
 /* Conteneur fixe pour les images */
 .card-img-container {
+  position: relative;
   width: 100%;
   height: 180px;          /* même hauteur pour toutes */
   overflow: hidden;
+  cursor: pointer;
+}
+
+.card-img-container::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background-color: rgba(13, 110, 253, 0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.card-img-container:focus-visible {
+  outline: 3px solid #0d6efd;
+  outline-offset: 3px;
 }
 
 /* Image recadrée sans déformation */
@@ -76,4 +93,24 @@
   height: 100%;
   object-fit: cover;      /* zoom et recadre sans étirer */
   object-position: center;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+/* Indique qu'une vignette est sélectionnable. */
+.card-img-container:hover .card-img-top,
+.card-img-container:focus-visible .card-img-top {
+  filter: brightness(0.8);
+  transform: scale(1.06);
+}
+
+.card-img-container:hover::after,
+.card-img-container:focus-visible::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-img-top,
+  .card-img-container::after {
+    transition: none;
+  }
 }

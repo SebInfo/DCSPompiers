@@ -42,8 +42,7 @@ function generationOptions(
                      class="card-img-top" 
                      alt="' . htmlspecialchars($titre, ENT_QUOTES) . '">
             </a>
-            <div class="card-body d-flex flex-column justify-content-between">
-                <h5 class="card-title text-center">' . htmlspecialchars($titre) . '</h5>
+            <div class="card-body d-flex flex-column">
                 <a href="' . htmlspecialchars($lien, ENT_QUOTES) . '" 
                    class="w-100 btn btn-lg btn-outline-primary mt-auto">'
                    . htmlspecialchars($titre_boutons) . '</a>
