@@ -5,6 +5,9 @@ exigerConnexion();
 require_once __DIR__ . '/include/baseDonnees.php';
 
 $erreur = '';
+$aujourdhui = new DateTimeImmutable('today');
+$dateNaissanceMinimum = $aujourdhui->modify('-80 years');
+$dateNaissanceMaximum = $aujourdhui->modify('-16 years');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Récupération des données communes aux deux types de pompier.
@@ -23,12 +26,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $idCaserne = filter_input(INPUT_POST, 'caserne', FILTER_VALIDATE_INT);
 
     // Préparation des contrôles de validité pour rendre la condition suivante lisible.
-    $dateNaissanceValide = DateTime::createFromFormat('Y-m-d', $dateNaissance);
+    $dateNaissanceValide = DateTimeImmutable::createFromFormat('!Y-m-d', $dateNaissance);
     $dateEmbaucheValide = DateTime::createFromFormat('Y-m-d', $dateEmbauche);
+    $dateNaissanceFormatValide = $dateNaissanceValide !== false
+        && $dateNaissanceValide->format('Y-m-d') === $dateNaissance;
+    $agePompierValide = $dateNaissanceFormatValide
+        && $dateNaissanceValide >= $dateNaissanceMinimum
+        && $dateNaissanceValide <= $dateNaissanceMaximum;
     $informationsCommunesInvalides = !preg_match('/^\d{6}$/', $matricule)
         || mb_strlen($nom) < 3 || mb_strlen($nom) > 45
         || mb_strlen($prenom) < 3 || mb_strlen($prenom) > 45
-        || !$dateNaissanceValide || $dateNaissanceValide->format('Y-m-d') !== $dateNaissance
+        || !$dateNaissanceFormatValide
         || !preg_match('/^\d{10}$/', $tel)
         || !in_array($sexe, ['féminin', 'masculin'], true)
         || !is_int($grade) || $grade < 1
@@ -43,6 +51,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!jetonCsrfValide($_POST['jeton_csrf'] ?? null)) {
         $erreur = 'Le formulaire a expiré. Veuillez recommencer.';
+    } elseif (!$dateNaissanceFormatValide) {
+        $erreur = 'La date de naissance est invalide.';
+    } elseif (!$agePompierValide) {
+        $erreur = 'Un pompier doit être âgé de 16 à 80 ans.';
     } elseif ($informationsCommunesInvalides) {
         $erreur = 'Certaines informations du formulaire sont incorrectes.';
     } elseif ($informationsVolontaireInvalides) {
@@ -152,9 +164,9 @@ require_once __DIR__ . '/include/entete.php';
           </div>
           <div class="form-group col-md-3">
             <label for="dateNaissance">Date de Naissance</label>
-            <input type="date" class="form-control" name="dateNaissance" id="dateNaissance" required>
+            <input type="date" class="form-control" name="dateNaissance" id="dateNaissance" min="<?php echo $dateNaissanceMinimum->format('Y-m-d'); ?>" max="<?php echo $dateNaissanceMaximum->format('Y-m-d'); ?>" required>
             <div class="invalid-feedback">
-              La date de naissance est obligatoire
+              La date de naissance doit correspondre à un âge compris entre 16 et 80 ans.
             </div>
           </div>
         </div>
