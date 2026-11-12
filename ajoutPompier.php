@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         || !is_int($idCaserne) || $idCaserne < 1
         || !in_array($type, ['volontaire', 'professionnel'], true);
     $informationsVolontaireInvalides = $type === 'volontaire'
-        && (!preg_match('/^\d{0,3}$/', $bip)
+        && (!preg_match('/^\d{1,3}$/', $bip)
             || ($idEmployeur !== null && (!is_int($idEmployeur) || $idEmployeur < 1)));
     $informationsProfessionnelInvalides = $type === 'professionnel'
         && (!is_int($indice) || $indice < 0
@@ -127,9 +127,12 @@ require_once __DIR__ . '/include/entete.php';
   <script>
     function afficherChampsSelonType(typePompier) {
       const estVolontaire = typePompier === 'volontaire';
+      const champBip = document.getElementById('bip');
 
       document.getElementById('blockVolontaire').style.display = estVolontaire ? 'block' : 'none';
       document.getElementById('blockPro').style.display = estVolontaire ? 'none' : 'block';
+      champBip.required = estVolontaire;
+      champBip.disabled = !estVolontaire;
     }
   </script>
   <div class="container">
@@ -275,9 +278,9 @@ require_once __DIR__ . '/include/entete.php';
             </div>
             <div class="form">
                 <label for="bip" id="titreBip">Bip</label>
-                <input type="number" class="form-control" name="bip" id="bip" placeholder="Ex : 123" >
+                <input type="number" class="form-control" name="bip" id="bip" placeholder="Ex : 123" min="0" max="999" step="1" required>
                 <div class="invalid-feedback">
-                  Le Bip obligatoire
+                  Le BIP est obligatoire et doit contenir de 1 à 3 chiffres.
                 </div>
             </div>
           </div> 
