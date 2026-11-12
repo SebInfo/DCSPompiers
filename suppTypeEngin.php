@@ -13,7 +13,7 @@ if (!preg_match('/^[A-Z]{2,4}$/', $idTypeEngin)) {
 
 $requete = $db->prepare(
     'SELECT idTypeEngin, LblEngin, image
-     FROM DSC.TypeEngin
+     FROM TypeEngin
      WHERE idTypeEngin = :idTypeEngin'
 );
 $requete->execute([':idTypeEngin' => $idTypeEngin]);
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $requete = $db->prepare(
-                'DELETE FROM DSC.TypeEngin
+                'DELETE FROM TypeEngin
                  WHERE idTypeEngin = :idTypeEngin'
             );
             $requete->execute([':idTypeEngin' => $engin['idTypeEngin']]);

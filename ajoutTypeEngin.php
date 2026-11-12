@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($erreur === '') {
             try {
                 $requete = $db->prepare(
-                    'INSERT INTO DSC.TypeEngin (idTypeEngin, LblEngin, image)
+                    'INSERT INTO TypeEngin (idTypeEngin, LblEngin, image)
                      VALUES (:idTypeEngin, :libelleEngin, :image)'
                 );
                 $requete->execute([

@@ -13,7 +13,7 @@ if (!preg_match('/^[A-Z]{2,4}$/', $idTypeEngin)) {
 
 $requete = $db->prepare(
     'SELECT idTypeEngin, LblEngin, image
-     FROM DSC.TypeEngin
+     FROM TypeEngin
      WHERE idTypeEngin = :idTypeEngin'
 );
 $requete->execute([':idTypeEngin' => $idTypeEngin]);
@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($erreur === '') {
             try {
                 $requete = $db->prepare(
-                    'UPDATE DSC.TypeEngin
+                    'UPDATE TypeEngin
                      SET LblEngin = :libelleEngin, image = :image
                      WHERE idTypeEngin = :idTypeEngin'
                 );

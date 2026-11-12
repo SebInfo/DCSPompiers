@@ -15,6 +15,8 @@ $bd         = $dotenv['DB_NAME'];
 $login      = $dotenv['DB_USER'];
 $motDePasse = $dotenv['DB_PASS'];
 
+// La base active est celle indiquée par DB_NAME dans le fichier .env.
+// Les requêtes peuvent donc utiliser directement les noms des tables.
 $dsn = "mysql:host=$hote;port=$port;dbname=$bd;charset=utf8mb4";
 
 try {

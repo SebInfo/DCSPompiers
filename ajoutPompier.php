@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Insertion des informations communes.
             $requete = $db->prepare(
-                'INSERT INTO DSC.Pompier
+                'INSERT INTO Pompier
                 (Matricule, NomPompier, PrenomPompier, DateNaissPompier, TelPompier, SexePompier, idGrade)
                 VALUES (:matricule, :nom, :prenom, :dateNaissance, :tel, :sexe, :grade)'
             );
@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($type === 'volontaire') {
                 // Insertion des informations spécifiques à un volontaire.
                 $requete = $db->prepare(
-                    'INSERT INTO DSC.Volontaire (MatVolontaire, Bip, IdEmployeur)
+                    'INSERT INTO Volontaire (MatVolontaire, Bip, IdEmployeur)
                     VALUES (:matricule, :bip, :idEmployeur)'
                 );
                 $requete->execute([
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 // Insertion des informations spécifiques à un professionnel.
                 $requete = $db->prepare(
-                    'INSERT INTO DSC.Professionnel (MatPro, DateEmbauche, Indice)
+                    'INSERT INTO Professionnel (MatPro, DateEmbauche, Indice)
                     VALUES (:matricule, :dateEmbauche, :indice)'
                 );
                 $requete->execute([
@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Une nouvelle affectation est créée à la date du jour.
             $requete = $db->prepare(
-                'INSERT INTO DSC.Affectation (Matricule, DateAff, IdCaserne)
+                'INSERT INTO Affectation (Matricule, DateAff, IdCaserne)
                 VALUES (:matricule, :dateAffectation, :idCaserne)'
             );
             $requete->execute([
@@ -198,7 +198,7 @@ require_once __DIR__ . '/include/entete.php';
             <div class="form-group">
               <select class="form-control" id="grade" name="grade">
                 <?php
-                  $listeGrade = "SELECT idGrade, LblGrade FROM DSC.Grade;";
+                  $listeGrade = "SELECT idGrade, LblGrade FROM Grade;";
                   foreach  ($db->query($listeGrade) as $row) {
                     echo '<option value="'.(int) $row["idGrade"].'">'.htmlspecialchars(ucwords($row["LblGrade"]), ENT_QUOTES, 'UTF-8').'</option>';
                   }
@@ -215,7 +215,7 @@ require_once __DIR__ . '/include/entete.php';
             <div class="form-group">
               <select class="form-control" name="caserne" id="caserne">
                 <?php
-                  $listeCaserne = "SELECT idCaserne, NomCaserne FROM DSC.Caserne;";
+                  $listeCaserne = "SELECT idCaserne, NomCaserne FROM Caserne;";
                   foreach  ($db->query($listeCaserne) as $row) {
                     echo '<option value="'.(int) $row["idCaserne"].'">'.htmlspecialchars(ucwords($row["NomCaserne"]), ENT_QUOTES, 'UTF-8').'</option>';
                   }
@@ -262,7 +262,7 @@ require_once __DIR__ . '/include/entete.php';
               <div class="form-group">
                 <select class="form-control col-md-6" name="employeur" id="employeur">
                   <?php
-                    $listeEmployeurs = "SELECT idEmployeur, NomEmployeur FROM DSC.Employeur;";
+                    $listeEmployeurs = "SELECT idEmployeur, NomEmployeur FROM Employeur;";
                     foreach ($db->query($listeEmployeurs) as $row) {
                       echo '<option value="'.(int) $row["idEmployeur"].'">'.htmlspecialchars(ucwords($row["NomEmployeur"]), ENT_QUOTES, 'UTF-8').'</option>';
                     }
