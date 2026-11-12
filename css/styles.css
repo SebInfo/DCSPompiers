@@ -54,8 +54,10 @@
 
 /* Uniformiser la hauteur des cartes */
 .uniform-card {
-  width: 18rem;
+  width: 100%;
+  max-width: 18rem;
   height: 25rem;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -63,6 +65,7 @@
 
 /* Conteneur fixe pour les images */
 .card-img-container {
+  width: 100%;
   height: 180px;          /* même hauteur pour toutes */
   overflow: hidden;
 }
